@@ -8,23 +8,23 @@ from sklearn.preprocessing import MinMaxScaler
 import cvxpy as cp
 
 path = Path.cwd()
-samples_tensor = np.load(path / 'Drum Synthesis' / 'samples_tensor.npy')
+samples_tensor = np.load(path / 'Drum Synthesis' / 'Data Exploration' / 'samples_tensor.npy')
 
 # Formulate SOCP problem
 n = samples_tensor.T.shape[1]
 X = samples_tensor.T.astype(np.double)
 
-kappa = cp.Variable()
+# kappa = cp.Variable()
 kappas = [cp.Variable() for _ in range(n)]
 W = cp.Variable((n, n))
 
 soc_constraints = []
-soc_constraints.append(kappa == 1)
-soc_constraints.append(sum(kappas) <= kappa)
+# soc_constraints.append(kappa == 1)
+# soc_constraints.append(sum(kappas) <= kappa)
 soc_constraints.extend([cp.SOC(kappas[i], W.T[i]) for i in range(n)])
 
 obj = cp.Minimize(cp.norm(X - X @ W.T, 'fro'))
-prob = cp.Problem(obj, soc_constraints)
+prob = cp.Problem(obj, soc_constraints + [kappas[i] <= 1/n for i in range(n)])
 
 prob.solve()
 
