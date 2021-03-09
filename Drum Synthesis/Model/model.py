@@ -124,19 +124,19 @@ class ResNetBigger(nn.Module):
     def forward(self, x):
     # Output of one layer becomes input to the next
         out = nn.ReLU()(self.bn1(self.conv1(x.unsqueeze(1))))
-        print('out 1: {}'.format(out.shape))
+        # print('out 1: {}'.format(out.shape))
         out = self.block1(out)
-        print('out 2: {}'.format(out.shape))
+        # print('out 2: {}'.format(out.shape))
         out = self.block2(out)
-        print('out 3: {}'.format(out.shape))
+        # print('out 3: {}'.format(out.shape))
         out = self.block3(out)
-        print('out 4: {}'.format(out.shape))
+        # print('out 4: {}'.format(out.shape))
         out = self.block4(out)
-        print('out 5: {}'.format(out.shape))
+        # print('out 5: {}'.format(out.shape))
         out = nn.AvgPool2d((4,1))(out)
-        print('out 5: {}'.format(out.shape))
+        # print('out 5: {}'.format(out.shape))
         out = out.view(out.size(0), -1)
-        print('out 6: {}'.format(out.shape))
+        # print('out 6: {}'.format(out.shape))
         out = self.bn2(out)
         out = self.dropout(out)
         out = self.linear1(out)
@@ -189,11 +189,11 @@ class VAE(nn.Module):
         '''
         Takes the weights of the output nodes and combine src samples into output
         '''
-        print('src shape: {}'.format(self.src.shape))
+        # print('src shape: {}'.format(self.src.shape))
         output = weights * self.src                   # Multiply each sample by weight
         output = torch.sum(output, dim=1)             # Sum them all together
-        print('output shape: {}'.format(output.shape))
-        return output.view(-1) / self.batch_size      # Flatten and normalize
+        # print('output shape: {}'.format(output.shape))
+        return output.view(-1) # / self.batch_size      # Flatten and normalize
 
     def forward(self, x):
         # mu_logvar = self.enc(x.view(sample_dim)).view(-1, 2, d)
@@ -204,12 +204,12 @@ class VAE(nn.Module):
 
         # Reshape decoded values to apply to linear combination
         weights = self.dec(z)
-        print('z shape: {}'.format(z.shape))
-        print('dec z shape: {}'.format(self.dec(z).shape))
-        print('weights shape: {}'.format(weights.shape))
+        # print('z shape: {}'.format(z.shape))
+        # print('dec z shape: {}'.format(self.dec(z).shape))
+        # print('weights shape: {}'.format(weights.shape))
         weights = weights.unsqueeze(2).unsqueeze(3)
         weights = weights.repeat(1, 1, self.src.shape[2], self.src.shape[3])
-        print('new weights shape: {}'.format(weights.shape))
+        # print('new weights shape: {}'.format(weights.shape))
         # Return the decoded latent variable along with mu and logvar to compute loss
         return self.combine_samples(weights), mu, logvar
 
